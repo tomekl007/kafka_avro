@@ -1,4 +1,4 @@
-package com.codenotfound.kafka.consumer;
+package com.tomekl007.kafka.consumer;
 
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;

@@ -1,4 +1,4 @@
-package com.codenotfound.kafka.producer;
+package com.tomekl007.kafka.producer;
 
 
 import org.apache.kafka.clients.producer.Callback;

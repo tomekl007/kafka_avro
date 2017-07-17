@@ -1,7 +1,7 @@
-package com.codenotfound.kafka;
+package com.tomekl007.kafka;
 
-import com.codenotfound.kafka.consumer.SpringKafkaReceiverTest;
-import com.codenotfound.kafka.producer.SpringKafkaSenderTest;
+import com.tomekl007.kafka.consumer.SpringKafkaReceiverTest;
+import com.tomekl007.kafka.producer.SpringKafkaSenderTest;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;

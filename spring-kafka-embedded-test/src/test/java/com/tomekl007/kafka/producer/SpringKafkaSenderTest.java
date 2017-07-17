@@ -1,6 +1,6 @@
-package com.codenotfound.kafka.producer;
+package com.tomekl007.kafka.producer;
 
-import com.codenotfound.kafka.AllSpringKafkaTests;
+import com.tomekl007.kafka.AllSpringKafkaTests;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.After;
 import org.junit.Before;

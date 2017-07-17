@@ -1,7 +1,7 @@
-package com.codenotfound.kafka;
+package com.tomekl007.kafka;
 
-import com.codenotfound.kafka.consumer.Receiver;
-import com.codenotfound.kafka.producer.Sender;
+import com.tomekl007.kafka.consumer.Receiver;
+import com.tomekl007.kafka.producer.Sender;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

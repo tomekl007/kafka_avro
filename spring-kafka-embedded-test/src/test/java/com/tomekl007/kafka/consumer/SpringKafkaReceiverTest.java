@@ -1,6 +1,6 @@
-package com.codenotfound.kafka.consumer;
+package com.tomekl007.kafka.consumer;
 
-import com.codenotfound.kafka.AllSpringKafkaTests;
+import com.tomekl007.kafka.AllSpringKafkaTests;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.codenotfound.kafka.AllSpringKafkaTests.CONSUMER_TEST_TOPIC;
+import static com.tomekl007.kafka.AllSpringKafkaTests.CONSUMER_TEST_TOPIC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
