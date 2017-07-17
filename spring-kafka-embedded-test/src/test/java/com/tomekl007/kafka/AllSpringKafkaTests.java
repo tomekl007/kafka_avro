@@ -21,10 +21,18 @@ public class AllSpringKafkaTests {
     public static final String SENDER_TOPIC = "sender.t";
     public static final String RECEIVER_TOPIC = "receiver.t";
     public static final String CONSUMER_TEST_TOPIC = "consumer_test_topic";
+    public static final Integer NUMBER_OF_PARTITIONS_PER_TOPIC = 4;
 
     @ClassRule
     public static KafkaEmbedded embeddedKafka =
-            new KafkaEmbedded(1, true, SENDER_TOPIC, RECEIVER_TOPIC, CONSUMER_TEST_TOPIC);
+            new KafkaEmbedded(
+                    1,
+                    true,
+                    NUMBER_OF_PARTITIONS_PER_TOPIC,
+                    SENDER_TOPIC,
+                    RECEIVER_TOPIC,
+                    CONSUMER_TEST_TOPIC
+            );
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {

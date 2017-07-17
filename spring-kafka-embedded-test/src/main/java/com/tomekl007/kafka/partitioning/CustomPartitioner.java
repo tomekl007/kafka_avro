@@ -12,11 +12,7 @@ import java.util.Map;
 
 public class CustomPartitioner implements Partitioner {
 
-    private final String userWithDedicatedPartition;
-
-    public CustomPartitioner(String userWithDedicatedPartition) {
-        this.userWithDedicatedPartition = userWithDedicatedPartition;
-    }
+    private final static Integer userWithDedicatedPartition = 777;
 
     @Override
     public void configure(Map<String, ?> configs) {
@@ -27,13 +23,12 @@ public class CustomPartitioner implements Partitioner {
                          Object value, byte[] valueBytes, Cluster cluster) {
         List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
         int numPartitions = partitions.size();
-        if ((keyBytes == null) || (!(key instanceof String)))
-            throw new InvalidRecordException("We expect all messages to have String userId as a Key");
+        if ((keyBytes == null) || (!(key instanceof Integer)))
+            throw new InvalidRecordException("We expect all messages to have Integer userId as a Key");
         if (key.equals(userWithDedicatedPartition))
-            return numPartitions; //that specific user will always go to the last partition
+            return numPartitions - 1; //that specific user will always go to the last partition
         return (Math.abs(Utils.murmur2(keyBytes)) % (numPartitions - 1));
     }
-    //to enable it props.put("partitioner.class", "com.codenotfound.kafka.partitioning.CustomPartitioner");
 
     @Override
     public void close() {
