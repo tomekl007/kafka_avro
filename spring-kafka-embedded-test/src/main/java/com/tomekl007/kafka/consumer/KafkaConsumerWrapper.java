@@ -1,6 +1,7 @@
 package com.tomekl007.kafka.consumer;
 
 
+import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -30,6 +31,11 @@ public class KafkaConsumerWrapper {
                     LOGGER.debug("topic = {}, partition = {}, offset = {}, key = {}, value = {}",
                             record.topic(), record.partition(), record.offset(), record.key(), record.value());
                     consumedMessages.add(record);
+                    try {
+                        consumer.commitSync();
+                    } catch (CommitFailedException e) {
+                        LOGGER.error("commit failed", e);
+                    }
                 }
             }
         } finally {
