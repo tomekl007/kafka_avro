@@ -24,6 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.kafka.test.assertj.KafkaConditions.key;
 import static org.springframework.kafka.test.assertj.KafkaConditions.value;
 
 @RunWith(SpringRunner.class)
@@ -33,9 +34,9 @@ public class SpringKafkaSenderTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringKafkaSenderTest.class);
 
 
-    private KafkaMessageListenerContainer<String, String> container;
+    private KafkaMessageListenerContainer<Integer, String> container;
 
-    private BlockingQueue<ConsumerRecord<String, String>> records;
+    private BlockingQueue<ConsumerRecord<Integer, String>> records;
 
     @Autowired
     private Sender sender;
@@ -47,8 +48,8 @@ public class SpringKafkaSenderTest {
                 KafkaTestUtils.consumerProps("sender_group", "false", AllSpringKafkaTests.embeddedKafka);
 
         // create a Kafka consumer factory
-        DefaultKafkaConsumerFactory<String, String> consumerFactory =
-                new DefaultKafkaConsumerFactory<String, String>(consumerProperties);
+        DefaultKafkaConsumerFactory<Integer, String> consumerFactory =
+                new DefaultKafkaConsumerFactory<>(consumerProperties);
 
         // set the topic that needs to be consumed
         ContainerProperties containerProperties =
@@ -61,12 +62,9 @@ public class SpringKafkaSenderTest {
         records = new LinkedBlockingQueue<>();
 
         // setup a Kafka message listener
-        container.setupMessageListener(new MessageListener<String, String>() {
-            @Override
-            public void onMessage(ConsumerRecord<String, String> record) {
-                LOGGER.debug("test-listener received message='{}'", record.toString());
-                records.add(record);
-            }
+        container.setupMessageListener((MessageListener<Integer, String>) record -> {
+            LOGGER.debug("test-listener received message='{}'", record.toString());
+            records.add(record);
         });
 
         // start the container and underlying message listener
@@ -90,7 +88,7 @@ public class SpringKafkaSenderTest {
         sender.sendBlocking(AllSpringKafkaTests.SENDER_TOPIC, content, userId);
 
         // check that the message was received
-        assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content));
+        assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content)).has(key(userId));
     }
 
     @Test
@@ -101,7 +99,7 @@ public class SpringKafkaSenderTest {
         sender.sendAsync(AllSpringKafkaTests.SENDER_TOPIC, content, userId);
 
         // check that the message was received
-        assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content));
+        assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content)).has(key(userId));
     }
 
 
