@@ -81,24 +81,28 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
-    public void testSendBlocking() throws Exception {
-        // send the message
+    public void givenMessage_whenSendBlockingWay_thenConsumerShouldReceiveIt() throws Exception {
+        //given
         String content = "User viewed page A";
         Integer userId = 12;
+
+        //when
         sender.sendBlocking(AllSpringKafkaTests.SENDER_TOPIC, content, userId);
 
-        // check that the message was received
+        // then
         assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content)).has(key(userId));
     }
 
     @Test
-    public void testSendAsync() throws Exception {
-        // send the message
+    public void givenMessage_whenSendAsyncWay_thenConsumerShouldReceiveIt() throws Exception {
+        //given
         String content = "User viewed page A";
         Integer userId = 123;
+
+        //when
         sender.sendAsync(AllSpringKafkaTests.SENDER_TOPIC, content, userId);
 
-        // check that the message was received
+        // then
         assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content)).has(key(userId));
     }
 

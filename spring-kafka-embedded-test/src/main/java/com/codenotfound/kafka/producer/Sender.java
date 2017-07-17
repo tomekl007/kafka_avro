@@ -14,9 +14,6 @@ public class Sender {
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
 
     @Autowired
-    private KafkaTemplate<Integer, String> kafkaTemplate;
-
-    @Autowired
     private Producer<Integer, String> producer;
 
     public void sendBlocking(String topic, String data, Integer partitionKey) {
