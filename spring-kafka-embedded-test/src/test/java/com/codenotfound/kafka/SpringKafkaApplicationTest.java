@@ -1,9 +1,7 @@
 package com.codenotfound.kafka;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.concurrent.TimeUnit;
-
+import com.codenotfound.kafka.consumer.Receiver;
+import com.codenotfound.kafka.producer.Sender;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,38 +12,39 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.codenotfound.kafka.consumer.Receiver;
-import com.codenotfound.kafka.producer.Sender;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SpringKafkaApplicationTest {
 
-  @Autowired
-  private Sender sender;
+    @Autowired
+    private Sender sender;
 
-  @Autowired
-  private Receiver receiver;
+    @Autowired
+    private Receiver receiver;
 
-  @Autowired
-  private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+    @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
-  @Before
-  public void setUp() throws Exception {
-    // wait until the partitions are assigned
-    for (MessageListenerContainer messageListenerContainer : kafkaListenerEndpointRegistry
-        .getListenerContainers()) {
-      ContainerTestUtils.waitForAssignment(messageListenerContainer,
-          AllSpringKafkaTests.embeddedKafka.getPartitionsPerTopic());
+    @Before
+    public void setUp() throws Exception {
+        // wait until the partitions are assigned
+        for (MessageListenerContainer messageListenerContainer : kafkaListenerEndpointRegistry
+                .getListenerContainers()) {
+            ContainerTestUtils.waitForAssignment(messageListenerContainer,
+                    AllSpringKafkaTests.embeddedKafka.getPartitionsPerTopic());
+        }
     }
-  }
 
-  @Test
-  public void testReceive() throws Exception {
-    sender.send(AllSpringKafkaTests.RECEIVER_TOPIC, "Hello Spring Kafka!");
+    @Test
+    public void testReceive() throws Exception {
+        sender.sendBlocking(AllSpringKafkaTests.RECEIVER_TOPIC, "Hello Spring Kafka!", "A");
 
-    receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
-    // check that the message was received
-    assertThat(receiver.getLatch().getCount()).isEqualTo(0);
-  }
+        receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+        // check that the message was received
+        assertThat(receiver.getLatch().getCount()).isEqualTo(0);
+    }
 }
