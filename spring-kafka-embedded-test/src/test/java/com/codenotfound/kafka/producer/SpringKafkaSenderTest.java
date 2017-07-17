@@ -86,7 +86,7 @@ public class SpringKafkaSenderTest {
     public void testSendBlocking() throws Exception {
         // send the message
         String content = "User viewed page A";
-        String userId = "12";
+        Integer userId = 12;
         sender.sendBlocking(AllSpringKafkaTests.SENDER_TOPIC, content, userId);
 
         // check that the message was received
@@ -97,7 +97,7 @@ public class SpringKafkaSenderTest {
     public void testSendAsync() throws Exception {
         // send the message
         String content = "User viewed page A";
-        String userId = "123";
+        Integer userId = 123;
         sender.sendAsync(AllSpringKafkaTests.SENDER_TOPIC, content, userId);
 
         // check that the message was received

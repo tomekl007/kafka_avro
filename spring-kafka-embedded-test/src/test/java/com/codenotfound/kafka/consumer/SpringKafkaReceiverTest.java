@@ -1,10 +1,6 @@
 package com.codenotfound.kafka.consumer;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.codenotfound.kafka.AllSpringKafkaTests;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,54 +17,57 @@ import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.codenotfound.kafka.AllSpringKafkaTests;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SpringKafkaReceiverTest {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SpringKafkaReceiverTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringKafkaReceiverTest.class);
 
-  @Autowired
-  private Receiver receiver;
+    @Autowired
+    private Receiver receiver;
 
-  @Autowired
-  private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+    @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
-  private KafkaTemplate<String, String> template;
+    private KafkaTemplate<String, String> template;
 
-  @Before
-  public void setUp() throws Exception {
-    // set up the Kafka producer properties
-    Map<String, Object> senderProperties =
-        KafkaTestUtils.senderProps(AllSpringKafkaTests.embeddedKafka.getBrokersAsString());
+    @Before
+    public void setUp() throws Exception {
+        // set up the Kafka producer properties
+        Map<String, Object> senderProperties =
+                KafkaTestUtils.senderProps(AllSpringKafkaTests.embeddedKafka.getBrokersAsString());
 
-    // create a Kafka producer factory
-    ProducerFactory<String, String> producerFactory =
-        new DefaultKafkaProducerFactory<String, String>(senderProperties);
+        // create a Kafka producer factory
+        ProducerFactory<String, String> producerFactory =
+                new DefaultKafkaProducerFactory<String, String>(senderProperties);
 
-    // create a Kafka template
-    template = new KafkaTemplate<>(producerFactory);
-    // set the default topic to send to
-    template.setDefaultTopic(AllSpringKafkaTests.RECEIVER_TOPIC);
+        // create a Kafka template
+        template = new KafkaTemplate<>(producerFactory);
+        // set the default topic to send to
+        template.setDefaultTopic(AllSpringKafkaTests.RECEIVER_TOPIC);
 
-    // wait until the partitions are assigned
-    for (MessageListenerContainer messageListenerContainer : kafkaListenerEndpointRegistry
-        .getListenerContainers()) {
-      ContainerTestUtils.waitForAssignment(messageListenerContainer,
-          AllSpringKafkaTests.embeddedKafka.getPartitionsPerTopic());
+        // wait until the partitions are assigned
+        for (MessageListenerContainer messageListenerContainer : kafkaListenerEndpointRegistry
+                .getListenerContainers()) {
+            ContainerTestUtils.waitForAssignment(messageListenerContainer,
+                    AllSpringKafkaTests.embeddedKafka.getPartitionsPerTopic());
+        }
     }
-  }
 
-  @Test
-  public void testReceive() throws Exception {
-    // send the message
-    String greeting = "Hello Spring Kafka Receiver!";
-    template.sendDefault(greeting);
-    LOGGER.debug("test-sender sent message='{}'", greeting);
+    @Test
+    public void testReceive() throws Exception {
+        // send the message
+        String greeting = "Hello Spring Kafka Receiver!";
+        template.sendDefault(greeting);
+        LOGGER.debug("test-sender sent message='{}'", greeting);
 
-    receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
-    // check that the message was received
-    assertThat(receiver.getLatch().getCount()).isEqualTo(0);
-  }
+        receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+        // check that the message was received
+        assertThat(receiver.getLatch().getCount()).isEqualTo(0);
+    }
 }
