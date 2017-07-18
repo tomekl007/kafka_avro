@@ -30,7 +30,7 @@ public class KafkaConsumerWrapper {
                 for (ConsumerRecord<Integer, String> record : records) {
                     LOGGER.debug("topic = {}, partition = {}, offset = {}, key = {}, value = {}",
                             record.topic(), record.partition(), record.offset(), record.key(), record.value());
-                    consumedMessages.add(record);
+                    logicProcessing(record);//important to be before commit offset
                     try {
                         consumer.commitSync();
                     } catch (CommitFailedException e) {
@@ -41,5 +41,9 @@ public class KafkaConsumerWrapper {
         } finally {
             consumer.close();
         }
+    }
+
+    private void logicProcessing(ConsumerRecord<Integer, String> record) {
+        consumedMessages.add(record);
     }
 }
