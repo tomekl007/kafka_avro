@@ -18,9 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static com.tomekl007.kafka.AllSpringKafkaTests.CONSUMER_TEST_TOPIC;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,9 +30,6 @@ public class SpringKafkaReceiverTest {
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     private Producer<Integer, String> kafkaProducer;
-
-    private KafkaConsumerWrapper kafkaConsumer;
-
 
     @Before
     public void setUp() throws Exception {
@@ -54,11 +49,6 @@ public class SpringKafkaReceiverTest {
             ContainerTestUtils.waitForAssignment(messageListenerContainer,
                     AllSpringKafkaTests.embeddedKafka.getPartitionsPerTopic());
         }
-
-        kafkaConsumer = new KafkaConsumerWrapper(
-                KafkaTestUtils.consumerProps("group_id", "false", AllSpringKafkaTests.embeddedKafka),
-                CONSUMER_TEST_TOPIC
-        );
     }
 
     @Test
@@ -67,18 +57,54 @@ public class SpringKafkaReceiverTest {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         String message = "Send unique message " + UUID.randomUUID().toString();
 
-        //when
-        executorService.submit(() -> kafkaConsumer.startConsuming());
+        KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapper(
+                KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
+                CONSUMER_TEST_TOPIC
+        );
 
-        kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC, message)).get(1, TimeUnit.SECONDS);
-        kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC, message)).get(1, TimeUnit.SECONDS);
-        kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC, message)).get(1, TimeUnit.SECONDS);
-        kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC, message)).get(1, TimeUnit.SECONDS);
+        //when
+        executorService.submit(kafkaConsumer::startConsuming);
+
+        for (int i = 0; i < 10; i++) {
+            kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC, message)).get(1, TimeUnit.SECONDS);
+        }
 
         //then
         executorService.awaitTermination(4, TimeUnit.SECONDS);
         executorService.shutdown();
         assertThat(kafkaConsumer.consumedMessages.get(0).value()).isEqualTo(message);
+    }
+
+    @Test
+    public void givenTwoConsumersWithDifferentGroupIds_whenSendMessageToTopic_thenBothShouldReceiveMessages() throws
+            InterruptedException, ExecutionException, TimeoutException {
+        //given
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        String message = "Send unique message " + UUID.randomUUID().toString();
+        KafkaConsumerWrapper kafkaConsumerFirst = new KafkaConsumerWrapper(
+                KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
+                CONSUMER_TEST_TOPIC
+        );
+        KafkaConsumerWrapper kafkaConsumerSecond = new KafkaConsumerWrapper(
+                KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
+                CONSUMER_TEST_TOPIC
+        );
+
+        //when
+        executorService.submit(kafkaConsumerFirst::startConsuming);
+        executorService.submit(kafkaConsumerSecond::startConsuming);
+
+
+        for (int i = 0; i < 10; i++) {
+            kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC, message)).get(1, TimeUnit.SECONDS);
+        }
+
+        //then
+        executorService.awaitTermination(4, TimeUnit.SECONDS);
+        executorService.shutdown();
+        assertThat(kafkaConsumerFirst.consumedMessages.size()).isEqualTo(kafkaConsumerSecond.consumedMessages.size());
+        assertThat(kafkaConsumerFirst.consumedMessages.get(0).value()).isEqualTo(message);
+        assertThat(kafkaConsumerSecond.consumedMessages.get(0).value()).isEqualTo(message);
     }
 
 }
