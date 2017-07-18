@@ -57,7 +57,7 @@ public class SpringKafkaReceiverTest {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         String message = "Send unique message " + UUID.randomUUID().toString();
 
-        KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapper(
+        KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapperSyncCommit(
                 KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC
         );
@@ -72,7 +72,7 @@ public class SpringKafkaReceiverTest {
         //then
         executorService.awaitTermination(4, TimeUnit.SECONDS);
         executorService.shutdown();
-        assertThat(kafkaConsumer.consumedMessages.get(0).value()).isEqualTo(message);
+        assertThat(kafkaConsumer.getConsumedEvents().get(0).value()).isEqualTo(message);
     }
 
     @Test
@@ -81,11 +81,11 @@ public class SpringKafkaReceiverTest {
         //given
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         String message = "Send unique message " + UUID.randomUUID().toString();
-        KafkaConsumerWrapper kafkaConsumerFirst = new KafkaConsumerWrapper(
+        KafkaConsumerWrapper kafkaConsumerFirst = new KafkaConsumerWrapperSyncCommit(
                 KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC
         );
-        KafkaConsumerWrapper kafkaConsumerSecond = new KafkaConsumerWrapper(
+        KafkaConsumerWrapper kafkaConsumerSecond = new KafkaConsumerWrapperSyncCommit(
                 KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC
         );
@@ -102,9 +102,9 @@ public class SpringKafkaReceiverTest {
         //then
         executorService.awaitTermination(4, TimeUnit.SECONDS);
         executorService.shutdown();
-        assertThat(kafkaConsumerFirst.consumedMessages.size()).isEqualTo(kafkaConsumerSecond.consumedMessages.size());
-        assertThat(kafkaConsumerFirst.consumedMessages.get(0).value()).isEqualTo(message);
-        assertThat(kafkaConsumerSecond.consumedMessages.get(0).value()).isEqualTo(message);
+        assertThat(kafkaConsumerFirst.getConsumedEvents().size()).isEqualTo(kafkaConsumerSecond.getConsumedEvents().size());
+        assertThat(kafkaConsumerFirst.getConsumedEvents().get(0).value()).isEqualTo(message);
+        assertThat(kafkaConsumerSecond.getConsumedEvents().get(0).value()).isEqualTo(message);
     }
 
 }
