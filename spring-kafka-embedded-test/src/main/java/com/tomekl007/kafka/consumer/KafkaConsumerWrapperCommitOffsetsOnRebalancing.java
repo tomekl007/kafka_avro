@@ -60,6 +60,11 @@ public class KafkaConsumerWrapperCommitOffsetsOnRebalancing implements KafkaCons
 
         @Override
         public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+            partitions.forEach(p -> {
+                OffsetAndMetadata offsetAndMetadata = currentOffsets.get(p);
+                consumer.seek(p, offsetAndMetadata.offset());
+
+            });
         }
 
         @Override
