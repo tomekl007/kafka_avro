@@ -20,6 +20,7 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -122,6 +123,34 @@ public class SpringKafkaSenderTest {
         // then
         assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content)).has(key(userId));
         assertThat(recordMetadata.partition()).isEqualTo(NUMBER_OF_PARTITIONS_PER_TOPIC - 1);
+    }
+
+    @Test
+    public void givenMessage_whenSendForOtherThanSpecificPartitionKey_thenMessageShouldAlwaysLandNOTInLastPartition() throws Exception {
+        //given
+        String content = "User viewed page C";
+        Integer userId = new Random().nextInt(100_000);
+
+        //when
+        RecordMetadata recordMetadata = sender.sendBlocking(AllSpringKafkaTests.SENDER_TOPIC, content, userId);
+
+        // then
+        assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content)).has(key(userId));
+        assertThat(recordMetadata.partition()).isBetween(0, NUMBER_OF_PARTITIONS_PER_TOPIC - 2);
+    }
+
+    @Test
+    public void givenMessage_whenSendEventForTopicThatNotExists_thenShouldSendMesageToFirstPartitionBecauseKafkaWIllCreateTopicWithOnlyOne() throws Exception {
+        //given
+        String content = "User viewed page X";
+        Integer userId = new Random().nextInt(100_000);
+        String topic = "non_existing_topic-that-kafka-will-create-with-one-partition";
+
+        //when
+        RecordMetadata recordMetadata = sender.sendBlocking(topic, content, userId);
+
+        // then
+        assertThat(recordMetadata.partition()).isEqualTo(0);
     }
 
 
