@@ -20,7 +20,8 @@ public class Sender {
     public RecordMetadata sendBlocking(String topic, String data, Integer partitionKey) {
         LOGGER.info("sending data='{}' to topic='{}'", data, topic);
         try {
-            return producer.send(new ProducerRecord<>(topic, partitionKey, data)).get(2, TimeUnit.SECONDS);
+            return producer.send(new ProducerRecord<>(topic, partitionKey, data))
+                    .get(2, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException("problem when send", e);
         }
@@ -28,6 +29,7 @@ public class Sender {
 
     public Future<RecordMetadata> sendAsync(String topic, String data, Integer partitionKey) {
         LOGGER.info("sending data='{}' to topic='{}'", data, topic);
-        return producer.send(new ProducerRecord<>(topic, partitionKey, data), new AsyncSenderCallback());
+        return producer.send(new ProducerRecord<>(topic, partitionKey, data),
+                new AsyncSenderCallback());
     }
 }

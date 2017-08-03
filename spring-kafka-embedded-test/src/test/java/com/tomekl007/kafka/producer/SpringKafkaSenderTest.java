@@ -105,7 +105,8 @@ public class SpringKafkaSenderTest {
         sender.sendAsync(AllSpringKafkaTests.SENDER_TOPIC, content, userId);
 
         // then
-        assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content)).has(key(userId));
+        assertThat(records.poll(10, TimeUnit.SECONDS)).has(value(content))
+                .has(key(userId));
     }
 
     @Test
