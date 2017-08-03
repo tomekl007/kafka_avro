@@ -3,6 +3,7 @@ package com.tomekl007.kafka.producer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.tomekl007.avro.User;
 import com.tomekl007.kafka.serializer.AvroSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -13,7 +14,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
-import example.avro.User;
+
 
 @Configuration
 public class SenderConfig {

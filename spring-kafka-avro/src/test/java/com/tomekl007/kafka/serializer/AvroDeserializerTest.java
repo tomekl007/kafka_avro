@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.tomekl007.avro.User;
 import org.junit.Test;
 
-import example.avro.User;
+
 
 public class AvroDeserializerTest {
 

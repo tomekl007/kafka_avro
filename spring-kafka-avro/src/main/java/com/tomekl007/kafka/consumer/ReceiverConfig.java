@@ -3,6 +3,7 @@ package com.tomekl007.kafka.consumer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.tomekl007.avro.User;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
 import com.tomekl007.kafka.serializer.AvroDeserializer;
 
-import example.avro.User;
+
 
 @Configuration
 @EnableKafka

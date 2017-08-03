@@ -2,11 +2,12 @@ package com.tomekl007.kafka.consumer;
 
 import java.util.concurrent.CountDownLatch;
 
+import com.tomekl007.avro.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 
-import example.avro.User;
+
 
 public class Receiver {
 
