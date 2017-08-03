@@ -107,4 +107,58 @@ public class SpringKafkaReceiverTest {
         assertThat(kafkaConsumerSecond.getConsumedEvents().get(0).value()).isEqualTo(message);
     }
 
+    @Test
+    public void givenConsumer_whenSendMessageToItAndOffsetOnRebalancingIsLargest_thenShouldConsumeOnlyRecentMessages() throws Exception {
+        //given
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        String message = "Send unique message " + UUID.randomUUID().toString();
+
+        KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapperCommitOffsetsOnRebalancing(
+                KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
+                CONSUMER_TEST_TOPIC,
+                "largest");
+
+        //when
+        sendTenMessages(message);
+
+        executorService.submit(kafkaConsumer::startConsuming);
+
+        sendTenMessages(message);
+
+        //then
+        executorService.awaitTermination(4, TimeUnit.SECONDS);
+        executorService.shutdown();
+        assertThat(kafkaConsumer.getConsumedEvents().size()).isLessThanOrEqualTo(10);
+        assertThat(kafkaConsumer.getConsumedEvents().get(0).value()).isEqualTo(message);
+    }
+
+    private void sendTenMessages(String message) throws InterruptedException, ExecutionException, TimeoutException {
+        for (int i = 0; i < 10; i++) {
+            kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC, message)).get(100, TimeUnit.SECONDS);
+        }
+    }
+
+    @Test
+    public void givenConsumer_whenSendMessageToItAndOffsetOnRebalancingIsSmallest_thenShouldConsumeMessagesFromTheBeginning() throws Exception {
+        //given
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        String message = "Send unique message " + UUID.randomUUID().toString();
+
+        KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapperCommitOffsetsOnRebalancing(
+                KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
+                CONSUMER_TEST_TOPIC,
+                "smallest");
+
+        //when
+        sendTenMessages(message);
+        executorService.submit(kafkaConsumer::startConsuming);
+        sendTenMessages(message);
+
+        //then
+        executorService.awaitTermination(4, TimeUnit.SECONDS);
+        executorService.shutdown();
+        assertThat(kafkaConsumer.getConsumedEvents().size()).isGreaterThanOrEqualTo(20);
+
+    }
+
 }

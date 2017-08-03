@@ -152,6 +152,4 @@ public class SpringKafkaSenderTest {
         // then
         assertThat(recordMetadata.partition()).isEqualTo(0);
     }
-
-
 }

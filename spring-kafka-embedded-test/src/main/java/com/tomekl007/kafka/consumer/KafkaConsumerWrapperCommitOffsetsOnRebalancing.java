@@ -13,10 +13,15 @@ public class KafkaConsumerWrapperCommitOffsetsOnRebalancing implements KafkaCons
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerWrapperCommitOffsetsOnRebalancing.class);
     private KafkaConsumer<Integer, String> consumer;
     public List<ConsumerRecord<Integer, String>> consumedMessages = new LinkedList<>();
+    //on production it should be saved to some external DB
     private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
+    private final String offsetWhenMissing;
 
-    public KafkaConsumerWrapperCommitOffsetsOnRebalancing(Map<String, Object> properties, String topic) {
+    public KafkaConsumerWrapperCommitOffsetsOnRebalancing(Map<String, Object> properties,
+                                                          String topic,
+                                                          String offsetWhenMissing) {
         consumer = new KafkaConsumer<>(properties);
+        this.offsetWhenMissing = offsetWhenMissing;
         consumer.subscribe(Collections.singletonList(topic), new RebalanceListener());
     }
 
@@ -28,12 +33,17 @@ public class KafkaConsumerWrapperCommitOffsetsOnRebalancing implements KafkaCons
                 for (ConsumerRecord<Integer, String> record : records) {
                     LOGGER.debug("topic = {}, partition = {}, offset = {}, key = {}, value = {}",
                             record.topic(), record.partition(), record.offset(), record.key(), record.value());
+                    logic(record);
                     currentOffsets.put(
                             new TopicPartition(record.topic(), record.partition()),
                             new OffsetAndMetadata(record.offset() + 1, "no metadata")
                     );
                 }
-                consumer.commitAsync(currentOffsets, null);
+                consumer.commitAsync(currentOffsets, (offsets, exception) -> {
+                    if (exception != null) {
+                        LOGGER.error("problem when commitAsync", exception);
+                    }
+                });
             }
 
         } catch (WakeupException e) {
@@ -49,6 +59,10 @@ public class KafkaConsumerWrapperCommitOffsetsOnRebalancing implements KafkaCons
         }
     }
 
+    private void logic(ConsumerRecord<Integer, String> record) {
+        consumedMessages.add(record);
+    }
+
 
     @Override
     public List<ConsumerRecord<Integer, String>> getConsumedEvents() {
@@ -60,8 +74,17 @@ public class KafkaConsumerWrapperCommitOffsetsOnRebalancing implements KafkaCons
 
         @Override
         public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+            LOGGER.info("onPartitions assigned: {}, offsets: {}", partitions, currentOffsets);
             partitions.forEach(p -> {
                 OffsetAndMetadata offsetAndMetadata = currentOffsets.get(p);
+                if (offsetAndMetadata == null) {
+                    if (offsetWhenMissing.equals("smallest")) {
+                        consumer.seekToBeginning(Collections.singletonList(p));
+                    } else if (offsetWhenMissing.equals("largest")) {
+                        consumer.seekToEnd(Collections.singletonList(p));
+                    }
+                    return;
+                }
                 consumer.seek(p, offsetAndMetadata.offset());
 
             });
