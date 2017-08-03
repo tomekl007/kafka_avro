@@ -1,4 +1,4 @@
-{"namespace": "example.avro",
+{"namespace": "com.tomekl007.avro",
   "type": "record",
   "name": "User",
   "fields": [

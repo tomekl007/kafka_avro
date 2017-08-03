@@ -1,9 +1,10 @@
-package com.codenotfound.kafka;
+package com.tomekl007.kafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.TimeUnit;
 
+import com.tomekl007.kafka.producer.Sender;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -17,10 +18,9 @@ import org.springframework.kafka.test.rule.KafkaEmbedded;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.codenotfound.kafka.consumer.Receiver;
-import com.codenotfound.kafka.producer.Sender;
+import com.tomekl007.kafka.consumer.Receiver;
 
-import example.avro.User;
+import com.tomekl007.avro.User;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

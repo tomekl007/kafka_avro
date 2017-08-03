@@ -1,8 +1,9 @@
-package com.codenotfound.kafka.producer;
+package com.tomekl007.kafka.producer;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import com.tomekl007.kafka.serializer.AvroSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,8 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-
-import com.codenotfound.kafka.serializer.AvroSerializer;
 
 import example.avro.User;
 

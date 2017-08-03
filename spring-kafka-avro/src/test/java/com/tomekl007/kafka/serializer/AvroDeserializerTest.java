@@ -1,4 +1,4 @@
-package com.codenotfound.kafka.serializer;
+package com.tomekl007.kafka.serializer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
