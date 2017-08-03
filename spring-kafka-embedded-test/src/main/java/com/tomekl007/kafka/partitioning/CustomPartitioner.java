@@ -23,6 +23,9 @@ public class CustomPartitioner implements Partitioner {
                          Object value, byte[] valueBytes, Cluster cluster) {
         List<PartitionInfo> partitions = cluster.partitionsForTopic(topic);
         int numPartitions = partitions.size();
+        if (numPartitions == 1) {
+            return 0;
+        }
         if ((keyBytes == null) || (!(key instanceof Integer)))
             throw new InvalidRecordException("We expect all messages to have Integer userId as a Key");
         if (key.equals(userWithDedicatedPartition))

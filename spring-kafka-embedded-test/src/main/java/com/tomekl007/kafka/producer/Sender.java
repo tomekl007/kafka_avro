@@ -24,12 +24,18 @@ public class Sender {
                     .get(2, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException("problem when send", e);
+        }finally {
+            producer.flush();
         }
     }
 
     public Future<RecordMetadata> sendAsync(String topic, String data, Integer partitionKey) {
         LOGGER.info("sending data='{}' to topic='{}'", data, topic);
-        return producer.send(new ProducerRecord<>(topic, partitionKey, data),
-                new AsyncSenderCallback());
+        try {
+            return producer.send(new ProducerRecord<>(topic, partitionKey, data),
+                    new AsyncSenderCallback());
+        }finally {
+            producer.flush();
+        }
     }
 }

@@ -47,7 +47,8 @@ public class SpringKafkaSenderTest {
     public void setUp() throws Exception {
         // set up the Kafka consumer properties
         Map<String, Object> consumerProperties =
-                KafkaTestUtils.consumerProps("sender_group", "false", AllSpringKafkaTests.embeddedKafka);
+                KafkaTestUtils.consumerProps("sender_group", "false",
+                        AllSpringKafkaTests.embeddedKafka);
 
         // create a Kafka consumer factory
         DefaultKafkaConsumerFactory<Integer, String> consumerFactory =
