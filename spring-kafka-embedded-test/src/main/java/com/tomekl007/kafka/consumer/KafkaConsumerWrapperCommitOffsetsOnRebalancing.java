@@ -15,11 +15,11 @@ public class KafkaConsumerWrapperCommitOffsetsOnRebalancing implements KafkaCons
     public List<ConsumerRecord<Integer, String>> consumedMessages = new LinkedList<>();
     //on production it should be saved to some external DB
     private final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
-    private final String offsetWhenMissing;
+    private final OffsetResetStrategy offsetWhenMissing;
 
     public KafkaConsumerWrapperCommitOffsetsOnRebalancing(Map<String, Object> properties,
                                                           String topic,
-                                                          String offsetWhenMissing) {
+                                                          OffsetResetStrategy offsetWhenMissing) {
         consumer = new KafkaConsumer<>(properties);
         this.offsetWhenMissing = offsetWhenMissing;
         consumer.subscribe(Collections.singletonList(topic), new RebalanceListener());
@@ -78,9 +78,9 @@ public class KafkaConsumerWrapperCommitOffsetsOnRebalancing implements KafkaCons
             partitions.forEach(p -> {
                 OffsetAndMetadata offsetAndMetadata = currentOffsets.get(p);
                 if (offsetAndMetadata == null) {
-                    if (offsetWhenMissing.equals("smallest")) {
+                    if (offsetWhenMissing.equals(OffsetResetStrategy.EARLIEST)) {
                         consumer.seekToBeginning(Collections.singletonList(p));
-                    } else if (offsetWhenMissing.equals("largest")) {
+                    } else if (offsetWhenMissing.equals(OffsetResetStrategy.LATEST)) {
                         consumer.seekToEnd(Collections.singletonList(p));
                     }
                     return;

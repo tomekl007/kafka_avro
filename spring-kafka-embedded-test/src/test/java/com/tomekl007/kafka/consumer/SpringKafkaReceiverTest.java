@@ -1,6 +1,7 @@
 package com.tomekl007.kafka.consumer;
 
 import com.tomekl007.kafka.AllSpringKafkaTests;
+import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Before;
@@ -116,7 +117,7 @@ public class SpringKafkaReceiverTest {
         KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapperCommitOffsetsOnRebalancing(
                 KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC,
-                "largest");
+                OffsetResetStrategy.LATEST);
 
         //when
         sendTenMessages(message);
@@ -147,7 +148,7 @@ public class SpringKafkaReceiverTest {
         KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapperCommitOffsetsOnRebalancing(
                 KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC,
-                "smallest");
+                OffsetResetStrategy.EARLIEST);
 
         //when
         sendTenMessages(message);
