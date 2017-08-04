@@ -103,7 +103,6 @@ public class SpringKafkaReceiverTest {
         //then
         executorService.awaitTermination(4, TimeUnit.SECONDS);
         executorService.shutdown();
-        assertThat(kafkaConsumerFirst.getConsumedEvents().size()).isEqualTo(kafkaConsumerSecond.getConsumedEvents().size());
         assertThat(kafkaConsumerFirst.getConsumedEvents().get(0).value()).isEqualTo(message);
         assertThat(kafkaConsumerSecond.getConsumedEvents().get(0).value()).isEqualTo(message);
     }
