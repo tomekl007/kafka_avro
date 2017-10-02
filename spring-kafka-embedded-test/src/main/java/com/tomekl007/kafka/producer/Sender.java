@@ -21,7 +21,8 @@ public class Sender {
     public RecordMetadata sendBlocking(String topic, String data, Integer partitionKey) {
         LOGGER.info("sending data='{}' to topic='{}'", data, topic);
         try {
-            throw new NotImplementedException();
+            return producer.send(new ProducerRecord<>(topic, partitionKey, data))
+                    .get(2, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException("problem when send", e);
         }finally {

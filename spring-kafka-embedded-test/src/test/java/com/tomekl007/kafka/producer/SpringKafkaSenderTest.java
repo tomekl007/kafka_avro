@@ -99,7 +99,6 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
-    @Ignore
     public void givenMessage_whenSendAsyncWay_thenConsumerShouldReceiveIt() throws Exception {
         //given
         String content = "User viewed page B";
