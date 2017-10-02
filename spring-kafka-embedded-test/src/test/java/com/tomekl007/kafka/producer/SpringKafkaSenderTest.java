@@ -113,7 +113,6 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
-    @Ignore
     public void givenMessage_whenSendForSpecificPartitionKey_thenMessageShouldAlwaysLandInLastPartition() throws Exception {
         //given
         String content = "User viewed page C";
@@ -128,7 +127,6 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
-    @Ignore
     public void givenMessage_whenSendForOtherThanSpecificPartitionKey_thenMessageShouldAlwaysLandNOTInLastPartition() throws Exception {
         //given
         String content = "User viewed page C";
