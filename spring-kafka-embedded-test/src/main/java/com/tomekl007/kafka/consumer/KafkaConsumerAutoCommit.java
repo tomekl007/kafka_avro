@@ -42,7 +42,7 @@ public class KafkaConsumerAutoCommit implements KafkaConsumerWrapper {
     }
 
     private void logicProcessing(ConsumerRecord<Integer, String> record) {
-        consumedMessages.add(record);
+        //implement consumer logic
     }
 
     @Override

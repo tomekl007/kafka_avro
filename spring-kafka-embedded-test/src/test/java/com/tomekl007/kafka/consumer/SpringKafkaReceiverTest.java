@@ -54,7 +54,6 @@ public class SpringKafkaReceiverTest {
     }
 
     @Test
-    @Ignore
     public void givenConsumerWithAutoCommit_whenSendMessageToIt_thenShouldReceiveInThePoolLoop() throws Exception {
         //given
         ExecutorService executorService = Executors.newSingleThreadExecutor();
