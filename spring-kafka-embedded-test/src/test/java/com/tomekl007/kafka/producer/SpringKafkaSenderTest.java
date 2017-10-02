@@ -141,7 +141,6 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
-    @Ignore
     public void givenMessage_whenSendEventForTopicThatNotExists_thenShouldSendMesageToFirstPartitionBecauseKafkaWIllCreateTopicWithOnlyOne() throws Exception {
         //given
         String content = "User viewed page X";

@@ -26,8 +26,8 @@ public class CustomPartitioner implements Partitioner {
 
         if ((keyBytes == null) || (!(key instanceof Integer)))
             throw new InvalidRecordException("We expect all messages to have Integer userId as a Key");
-        //route to userWithDedicatedPartition specific partition
-
+        if (key.equals(userWithDedicatedPartition))
+            return numPartitions - 1; //that specific user will always go to the last partition
         return (Math.abs(Utils.murmur2(keyBytes)) % (numPartitions - 1));
     }
 
