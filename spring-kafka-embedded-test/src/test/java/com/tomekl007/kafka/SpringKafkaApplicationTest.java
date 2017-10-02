@@ -3,6 +3,7 @@ package com.tomekl007.kafka;
 import com.tomekl007.kafka.consumer.Receiver;
 import com.tomekl007.kafka.producer.Sender;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class SpringKafkaApplicationTest {
     }
 
     @Test
+    @Ignore
     public void testReceive() throws Exception {
         sender.sendBlocking(AllSpringKafkaTests.RECEIVER_TOPIC, "Hello Spring Kafka!", 1);
 

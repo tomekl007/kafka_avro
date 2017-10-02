@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public class SpringKafkaReceiverTest {
     }
 
     @Test
+    @Ignore
     public void givenConsumer_whenSendMessageToIt_thenShouldReceiveInThePoolLoop() throws Exception {
         //given
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -77,6 +79,7 @@ public class SpringKafkaReceiverTest {
     }
 
     @Test
+    @Ignore
     public void givenTwoConsumersWithDifferentGroupIds_whenSendMessageToTopic_thenBothShouldReceiveMessages() throws
             InterruptedException, ExecutionException, TimeoutException {
         //given
@@ -108,6 +111,7 @@ public class SpringKafkaReceiverTest {
     }
 
     @Test
+    @Ignore
     public void givenConsumer_whenSendMessageToItAndOffsetOnRebalancingIsLargest_thenShouldConsumeOnlyRecentMessages() throws Exception {
         //given
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -139,6 +143,7 @@ public class SpringKafkaReceiverTest {
     }
 
     @Test
+    @Ignore
     public void givenConsumer_whenSendMessageToItAndOffsetOnRebalancingIsSmallest_thenShouldConsumeMessagesFromTheBeginning() throws Exception {
         //given
         ExecutorService executorService = Executors.newSingleThreadExecutor();

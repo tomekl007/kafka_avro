@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -98,6 +99,7 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
+    @Ignore
     public void givenMessage_whenSendAsyncWay_thenConsumerShouldReceiveIt() throws Exception {
         //given
         String content = "User viewed page B";
@@ -112,6 +114,7 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
+    @Ignore
     public void givenMessage_whenSendForSpecificPartitionKey_thenMessageShouldAlwaysLandInLastPartition() throws Exception {
         //given
         String content = "User viewed page C";
@@ -126,6 +129,7 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
+    @Ignore
     public void givenMessage_whenSendForOtherThanSpecificPartitionKey_thenMessageShouldAlwaysLandNOTInLastPartition() throws Exception {
         //given
         String content = "User viewed page C";
@@ -140,6 +144,7 @@ public class SpringKafkaSenderTest {
     }
 
     @Test
+    @Ignore
     public void givenMessage_whenSendEventForTopicThatNotExists_thenShouldSendMesageToFirstPartitionBecauseKafkaWIllCreateTopicWithOnlyOne() throws Exception {
         //given
         String content = "User viewed page X";

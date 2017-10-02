@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -20,8 +21,7 @@ public class Sender {
     public RecordMetadata sendBlocking(String topic, String data, Integer partitionKey) {
         LOGGER.info("sending data='{}' to topic='{}'", data, topic);
         try {
-            return producer.send(new ProducerRecord<>(topic, partitionKey, data))
-                    .get(2, TimeUnit.SECONDS);
+            throw new NotImplementedException();
         } catch (Exception e) {
             throw new RuntimeException("problem when send", e);
         }finally {
@@ -32,8 +32,7 @@ public class Sender {
     public Future<RecordMetadata> sendAsync(String topic, String data, Integer partitionKey) {
         LOGGER.info("sending data='{}' to topic='{}'", data, topic);
         try {
-            return producer.send(new ProducerRecord<>(topic, partitionKey, data),
-                    new AsyncSenderCallback());
+            throw new NotImplementedException();
         }finally {
             producer.flush();
         }
