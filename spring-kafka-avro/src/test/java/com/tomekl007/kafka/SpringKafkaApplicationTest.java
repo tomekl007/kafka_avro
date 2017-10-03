@@ -51,12 +51,15 @@ public class SpringKafkaApplicationTest {
   }
 
   @Test
-  @Ignore
   public void testReceiver() throws Exception {
+    //given
     User user = User.newBuilder().setName("John Doe").setFavoriteColor("green")
         .setFavoriteNumber(null).build();
+
+    //when
     sender.send(user);
 
+    //then
     receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
     assertThat(receiver.getLatch().getCount()).isEqualTo(0);
   }
