@@ -33,7 +33,10 @@ public class KafkaConsumerWrapperAsyncCommit implements KafkaConsumerWrapper {
                         record.topic(), record.partition(), record.offset(), record.key(), record.value());
                 logicProcessing(record);
             }
-            //todo implement commit async
+            consumer.commitAsync((offsets, exception) -> {
+                if (exception != null)
+                    LOGGER.error("Commit failed for offsets {}", offsets, exception);
+            });
         }
     }
 
