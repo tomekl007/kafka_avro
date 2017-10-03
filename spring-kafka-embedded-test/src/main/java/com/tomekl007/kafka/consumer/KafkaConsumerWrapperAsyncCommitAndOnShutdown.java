@@ -33,12 +33,16 @@ public class KafkaConsumerWrapperAsyncCommitAndOnShutdown implements KafkaConsum
                             record.topic(), record.partition(), record.offset(), record.key(), record.value());
                     logicProcessing(record);
                 }
-                //todo implemement commitAsync
+                consumer.commitAsync();
             }
         } catch (Exception e) {
             LOGGER.error("Unexpected error", e);
         } finally {
-            //todo before closing consumer try to commitSync
+            try {
+                consumer.commitSync();
+            } finally {
+                consumer.close();
+            }
         }
     }
 
