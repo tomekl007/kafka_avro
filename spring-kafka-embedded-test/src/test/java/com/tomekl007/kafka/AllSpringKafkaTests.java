@@ -23,6 +23,7 @@ public class AllSpringKafkaTests {
     public static final String CONSUMER_TEST_TOPIC = "consumer_test_topic";
     public static final String CONSUMER_TEST_TOPIC_COMMIT_SYNC = "consumer_test_topic_commit_sync";
     public static final String CONSUMER_TEST_TOPIC_COMMIT_ASYNC = "consumer_test_topic_commit_async";
+    public static final String CONSUMER_TEST_TOPIC_COMMIT_ASYNC_AND_SYNC = "consumer_test_topic_commit_async_and_sync";
     public static final Integer NUMBER_OF_PARTITIONS_PER_TOPIC = 4;
 
     @ClassRule
@@ -35,7 +36,8 @@ public class AllSpringKafkaTests {
                     RECEIVER_TOPIC,
                     CONSUMER_TEST_TOPIC,
                     CONSUMER_TEST_TOPIC_COMMIT_SYNC,
-                    CONSUMER_TEST_TOPIC_COMMIT_ASYNC
+                    CONSUMER_TEST_TOPIC_COMMIT_ASYNC,
+                    CONSUMER_TEST_TOPIC_COMMIT_ASYNC_AND_SYNC
             );
 
     @BeforeClass
