@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AvroDeserializerTest {
 
     @Test
-    @Ignore
     public void testDeserialize() {
         //given
         User user = User.newBuilder().setName("John Doe").setFavoriteColor("green")
@@ -20,9 +19,9 @@ public class AvroDeserializerTest {
 
         //when
         byte[] data = DatatypeConverter.parseHexBinary("104A6F686E20446F6502000A677265656E");
-
         AvroDeserializer<User> avroDeserializer = new AvroDeserializer<>(User.class);
 
+        //then
         assertThat(avroDeserializer.deserialize("avro.t", data)).isEqualTo(user);
         avroDeserializer.close();
     }
