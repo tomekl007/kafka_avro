@@ -344,7 +344,6 @@ public class SpringKafkaReceiverTest {
     }
 
     @Test
-    @Ignore
     public void givenConsumer_whenSendMessageToItAndOffsetOnRebalancingIsLargest_thenShouldConsumeOnlyRecentMessages() throws Exception {
         //given
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -353,7 +352,7 @@ public class SpringKafkaReceiverTest {
         KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapperCommitOffsetsOnRebalancing(
                 KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC,
-                OffsetResetStrategy.LATEST);
+                OffsetResetStrategy.LATEST); //latest is default in kafka
 
         //when
         sendTenMessages(message);
@@ -376,7 +375,6 @@ public class SpringKafkaReceiverTest {
     }
 
     @Test
-    @Ignore
     public void givenConsumer_whenSendMessageToItAndOffsetOnRebalancingIsSmallest_thenShouldConsumeMessagesFromTheBeginning() throws Exception {
         //given
         ExecutorService executorService = Executors.newSingleThreadExecutor();

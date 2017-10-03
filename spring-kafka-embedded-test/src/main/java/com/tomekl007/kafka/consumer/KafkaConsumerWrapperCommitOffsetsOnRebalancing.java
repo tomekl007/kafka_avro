@@ -78,11 +78,7 @@ public class KafkaConsumerWrapperCommitOffsetsOnRebalancing implements KafkaCons
             partitions.forEach(p -> {
                 OffsetAndMetadata offsetAndMetadata = currentOffsets.get(p);
                 if (offsetAndMetadata == null) {
-                    if (offsetWhenMissing.equals(OffsetResetStrategy.EARLIEST)) {
-                        consumer.seekToBeginning(Collections.singletonList(p));
-                    } else if (offsetWhenMissing.equals(OffsetResetStrategy.LATEST)) {
-                        consumer.seekToEnd(Collections.singletonList(p));
-                    }
+                //todo implement strategy depending on offsetWhenMissing
                     return;
                 }
                 consumer.seek(p, offsetAndMetadata.offset());
