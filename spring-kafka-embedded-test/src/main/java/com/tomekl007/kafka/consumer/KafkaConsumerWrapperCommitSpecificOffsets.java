@@ -38,7 +38,8 @@ public class KafkaConsumerWrapperCommitSpecificOffsets implements KafkaConsumerW
                         new TopicPartition(record.topic(), record.partition()),
                         new OffsetAndMetadata(record.offset() + 1, "no metadata")
                 );
-                //todo commit offsets every 10 element ( in batches )
+                if (count % 10 == 0)
+                    consumer.commitAsync(currentOffsets, null);
                 count++;
             }
         }
