@@ -29,6 +29,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.tomekl007.kafka.AllSpringKafkaTests.CONSUMER_TEST_TOPIC;
+import static com.tomekl007.kafka.AllSpringKafkaTests.CONSUMER_TEST_TOPIC_COMMIT_ASYNC;
 import static com.tomekl007.kafka.AllSpringKafkaTests.CONSUMER_TEST_TOPIC_COMMIT_SYNC;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -142,14 +143,61 @@ public class SpringKafkaReceiverTest {
         assertThat(hasDuplicates(message, newConsumer)).isFalse();
     }
 
-    private boolean hasDuplicates(String duplicate, KafkaConsumerWrapperSyncCommit newConsumer) {
-        return newConsumer
-                .getConsumedEvents()
-                .stream()
-                .map(ConsumerRecord::value)
-                .collect(Collectors.toList())
-                .contains(duplicate);
+    @Test
+    public void givenConsumerWithASyncCommit_whenSendMessageToIt_thenShouldReceiveInThePoolLoop() throws Exception {
+        //given
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        String message = "Send unique message " + UUID.randomUUID().toString();
+        String gropupId = "group_id" + UUID.randomUUID().toString();
+
+        KafkaConsumerWrapperAsyncCommit kafkaConsumer = new KafkaConsumerWrapperAsyncCommit(
+                consumerConfigs(gropupId,
+                        "false",
+                        AllSpringKafkaTests.embeddedKafka.getBrokersAsString()
+                ),
+                CONSUMER_TEST_TOPIC_COMMIT_ASYNC
+        );
+
+        //when
+        executorService.submit(kafkaConsumer::startConsuming);
+
+        for (int i = 0; i < 10; i++) {
+            kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC_COMMIT_ASYNC,
+                    message)).get(100, TimeUnit.SECONDS);
+        }
+
+        //then
+        executorService.awaitTermination(4, TimeUnit.SECONDS);
+        executorService.shutdown();
+        assertThat(kafkaConsumer.getConsumedEvents().size()).isLessThanOrEqualTo(10);
+        assertThat(kafkaConsumer.getConsumedEvents().get(0).value()).isEqualTo(message);
+
+        //when
+        String messageNewProducer = "Send unique message " + UUID.randomUUID().toString();
+        KafkaConsumerWrapperAsyncCommit newConsumer = new KafkaConsumerWrapperAsyncCommit(
+                consumerConfigs(gropupId,
+                        "false",
+                        AllSpringKafkaTests.embeddedKafka.getBrokersAsString()
+                ),
+                CONSUMER_TEST_TOPIC_COMMIT_ASYNC
+        );
+
+
+        ExecutorService executorService2 = Executors.newSingleThreadExecutor();
+        executorService2.submit(newConsumer::startConsuming);
+
+        for (int i = 10; i < 20; i++) {
+            kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC_COMMIT_ASYNC,
+                    messageNewProducer)).get(100, TimeUnit.SECONDS);
+        }
+
+        executorService2.awaitTermination(4, TimeUnit.SECONDS);
+        executorService2.shutdown();
+
+        assertThat(newConsumer.getConsumedEvents().size()).isLessThanOrEqualTo(10);
+        assertThat(hasDuplicates(message, newConsumer)).isFalse();
     }
+
 
     @Test
     @Ignore
@@ -252,6 +300,16 @@ public class SpringKafkaReceiverTest {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         return props;
+    }
+
+
+    private boolean hasDuplicates(String duplicate, KafkaConsumerWrapper newConsumer) {
+        return newConsumer
+                .getConsumedEvents()
+                .stream()
+                .map(ConsumerRecord::value)
+                .collect(Collectors.toList())
+                .contains(duplicate);
     }
 
 }
