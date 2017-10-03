@@ -289,6 +289,61 @@ public class SpringKafkaReceiverTest {
     }
 
     @Test
+    public void givenConsumerThatCommitsSpecificOffsets_whenSendMessageToIt_thenShouldReceiveInThePoolLoop() throws Exception {
+        //given
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        String message = "Send unique message " + UUID.randomUUID().toString();
+        String gropupId = "group_id" + UUID.randomUUID().toString();
+
+        KafkaConsumerWrapper kafkaConsumer = new KafkaConsumerWrapperCommitSpecificOffsets(
+                consumerConfigs(gropupId,
+                        "false",
+                        AllSpringKafkaTests.embeddedKafka.getBrokersAsString()
+                ),
+                CONSUMER_TEST_TOPIC_COMMIT_SPECIFIC_OFFSETS
+        );
+
+        //when
+        executorService.submit(kafkaConsumer::startConsuming);
+
+        for (int i = 0; i < 100; i++) {
+            kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC_COMMIT_SPECIFIC_OFFSETS,
+                    message)).get(100, TimeUnit.SECONDS);
+        }
+
+        //then
+        executorService.awaitTermination(4, TimeUnit.SECONDS);
+        executorService.shutdown();
+        assertThat(kafkaConsumer.getConsumedEvents().size()).isLessThanOrEqualTo(100);
+        assertThat(kafkaConsumer.getConsumedEvents().get(0).value()).isEqualTo(message);
+
+        //when
+        String messageNewProducer = "Send unique message " + UUID.randomUUID().toString();
+        KafkaConsumerWrapper newConsumer = new KafkaConsumerWrapperCommitSpecificOffsets(
+                consumerConfigs(gropupId,
+                        "false",
+                        AllSpringKafkaTests.embeddedKafka.getBrokersAsString()
+                ),
+                CONSUMER_TEST_TOPIC_COMMIT_SPECIFIC_OFFSETS
+        );
+
+
+        ExecutorService executorService2 = Executors.newSingleThreadExecutor();
+        executorService2.submit(newConsumer::startConsuming);
+
+        for (int i = 100; i < 200; i++) {
+            kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC_COMMIT_SPECIFIC_OFFSETS,
+                    messageNewProducer)).get(100, TimeUnit.SECONDS);
+        }
+
+        executorService2.awaitTermination(4, TimeUnit.SECONDS);
+        executorService2.shutdown();
+
+        assertThat(newConsumer.getConsumedEvents().size()).isLessThanOrEqualTo(100);
+        assertThat(hasDuplicates(message, newConsumer)).isFalse();
+    }
+
+    @Test
     @Ignore
     public void givenConsumer_whenSendMessageToItAndOffsetOnRebalancingIsLargest_thenShouldConsumeOnlyRecentMessages() throws Exception {
         //given
