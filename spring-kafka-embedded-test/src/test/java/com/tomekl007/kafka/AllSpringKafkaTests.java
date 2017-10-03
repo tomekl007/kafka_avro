@@ -21,6 +21,7 @@ public class AllSpringKafkaTests {
     public static final String SENDER_TOPIC = "sender.t";
     public static final String RECEIVER_TOPIC = "receiver.t";
     public static final String CONSUMER_TEST_TOPIC = "consumer_test_topic";
+    public static final String CONSUMER_TEST_TOPIC_COMMIT_SYNC = "consumer_test_topic_commit_sync";
     public static final Integer NUMBER_OF_PARTITIONS_PER_TOPIC = 4;
 
     @ClassRule
@@ -31,7 +32,9 @@ public class AllSpringKafkaTests {
                     NUMBER_OF_PARTITIONS_PER_TOPIC,
                     SENDER_TOPIC,
                     RECEIVER_TOPIC,
-                    CONSUMER_TEST_TOPIC
+                    CONSUMER_TEST_TOPIC,
+                    CONSUMER_TEST_TOPIC_COMMIT_SYNC
+
             );
 
     @BeforeClass

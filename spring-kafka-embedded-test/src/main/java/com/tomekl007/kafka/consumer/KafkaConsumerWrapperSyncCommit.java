@@ -5,13 +5,12 @@ import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class KafkaConsumerWrapperSyncCommit implements KafkaConsumerWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerWrapperSyncCommit.class);
@@ -22,6 +21,7 @@ public class KafkaConsumerWrapperSyncCommit implements KafkaConsumerWrapper {
         consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(Collections.singletonList(topic));
     }
+
 
     @Override
     public void startConsuming() {
@@ -44,6 +44,23 @@ public class KafkaConsumerWrapperSyncCommit implements KafkaConsumerWrapper {
         }
     }
 
+
+    public List<TopicPartition> getPartitions() {
+        return getConsumedEvents().stream()
+                .map(v -> new TopicPartition(
+                        v.topic(),
+                        v.partition())).collect(Collectors.toList());
+    }
+
+    public Collection<Long> getLastCommittedOffsetsPerPartitions() {
+        return consumer.endOffsets(getPartitions()).values();
+    }
+
+    public Collection<Long> getLastCommittedOffsetsPerPartitions(List<TopicPartition> partitions) {
+        return consumer.endOffsets(getPartitions()).values();
+    }
+
+
     @Override
     public List<ConsumerRecord<Integer, String>> getConsumedEvents() {
         return consumedMessages;
@@ -52,4 +69,5 @@ public class KafkaConsumerWrapperSyncCommit implements KafkaConsumerWrapper {
     private void logicProcessing(ConsumerRecord<Integer, String> record) {
         consumedMessages.add(record);
     }
+
 }
