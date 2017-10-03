@@ -254,15 +254,13 @@ public class SpringKafkaReceiverTest {
     public void givenTwoConsumersWithDifferentGroupIds_whenSendMessageToTopic_thenBothShouldReceiveMessages() throws
             InterruptedException, ExecutionException, TimeoutException {
         //given
-        //todo we want to split traffic to two separated apps
-        String groupId = "group_id" + UUID.randomUUID().toString();
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         KafkaConsumerWrapper kafkaConsumerFirst = new KafkaConsumerWrapperSyncCommit(
-                KafkaTestUtils.consumerProps(groupId, "false", AllSpringKafkaTests.embeddedKafka),
+                KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC
         );
         KafkaConsumerWrapper kafkaConsumerSecond = new KafkaConsumerWrapperSyncCommit(
-                KafkaTestUtils.consumerProps(groupId, "false", AllSpringKafkaTests.embeddedKafka),
+                KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC
         );
 
