@@ -49,7 +49,7 @@ public class AvroSerializer<T extends SpecificRecordBase> implements Serializer<
         binaryEncoder.flush();
         byteArrayOutputStream.close();
 
-        result = byteArrayOutputStream.toByteArray();
+        //todo result should be assigned to binary array
         LOGGER.debug("serialized data='{}'", DatatypeConverter.printHexBinary(result));
       }
       return result;
