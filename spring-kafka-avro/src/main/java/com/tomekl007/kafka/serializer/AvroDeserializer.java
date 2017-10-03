@@ -46,7 +46,7 @@ public class AvroDeserializer<T extends SpecificRecordBase> implements Deseriali
         LOGGER.debug("data='{}'", DatatypeConverter.printHexBinary(data));
 
         DatumReader<GenericRecord> datumReader =
-            null;//todo create SpecificDatumReader
+            new SpecificDatumReader<>(targetType.newInstance().getSchema());
         Decoder decoder = DecoderFactory.get().binaryDecoder(data, null);
 
         result = (T) datumReader.read(null, decoder);
