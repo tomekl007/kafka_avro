@@ -32,11 +32,7 @@ public class KafkaConsumerWrapperSyncCommit implements KafkaConsumerWrapper {
                     LOGGER.debug("topic = {}, partition = {}, offset = {}, key = {}, value = {}",
                             record.topic(), record.partition(), record.offset(), record.key(), record.value());
                     logicProcessing(record);//important to be before commit offset
-                    try {
-                        consumer.commitSync();
-                    } catch (CommitFailedException e) {
-                        LOGGER.error("commit failed", e);
-                    }
+                    //todo sync commit
                 }
             }
         } finally {
