@@ -22,9 +22,7 @@ import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -253,12 +251,10 @@ public class SpringKafkaReceiverTest {
 
 
     @Test
-    @Ignore
     public void givenTwoConsumersWithDifferentGroupIds_whenSendMessageToTopic_thenBothShouldReceiveMessages() throws
             InterruptedException, ExecutionException, TimeoutException {
         //given
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        String message = "Send unique message " + UUID.randomUUID().toString();
         KafkaConsumerWrapper kafkaConsumerFirst = new KafkaConsumerWrapperSyncCommit(
                 KafkaTestUtils.consumerProps("group_id" + UUID.randomUUID().toString(), "false", AllSpringKafkaTests.embeddedKafka),
                 CONSUMER_TEST_TOPIC
@@ -274,14 +270,22 @@ public class SpringKafkaReceiverTest {
 
 
         for (int i = 0; i < 10; i++) {
-            kafkaProducer.send(new ProducerRecord<>(CONSUMER_TEST_TOPIC, message)).get(1, TimeUnit.SECONDS);
+            kafkaProducer
+                    .send(new ProducerRecord<>(CONSUMER_TEST_TOPIC,
+                            "Send unique message " + UUID.randomUUID().toString())
+                    )
+                    .get(1, TimeUnit.SECONDS);
         }
 
         //then
         executorService.awaitTermination(4, TimeUnit.SECONDS);
         executorService.shutdown();
-        assertThat(kafkaConsumerFirst.getConsumedEvents().get(0).value()).isEqualTo(message);
-        assertThat(kafkaConsumerSecond.getConsumedEvents().get(0).value()).isEqualTo(message);
+        assertThat(
+                hasDuplicates(
+                        kafkaConsumerFirst.getConsumedEvents(),
+                        kafkaConsumerSecond.getConsumedEvents()
+                )
+        ).isTrue();
     }
 
     @Test
@@ -363,6 +367,17 @@ public class SpringKafkaReceiverTest {
                 .map(ConsumerRecord::value)
                 .collect(Collectors.toList())
                 .contains(duplicate);
+    }
+
+
+    private boolean hasDuplicates(List<ConsumerRecord<Integer, String>> first, List<ConsumerRecord<Integer, String>> second) {
+        Set<String> setSecond = second.stream().map(ConsumerRecord::value).collect(Collectors.toSet());
+        return first
+                .stream()
+                .map(ConsumerRecord::value)
+                .anyMatch(setSecond::contains);
+
+
     }
 
 }
